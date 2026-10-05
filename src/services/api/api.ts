@@ -33,3 +33,20 @@ export async function getCourses(): Promise<Course[]> {
 
     return data.results;
 }
+
+export async function getCurrentStudent() {
+    const token = localStorage.getItem("access_token");
+
+    const response = await fetch(`${API_URL}/students/me/`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+    }
+
+    return response.json();
+}
