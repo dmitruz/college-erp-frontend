@@ -1,18 +1,27 @@
 import { useEffect, useState } from "react";
 import { getCourses } from "./services/api/api";
+import LoginForm from "./components/LoginForm";
 
 interface Course {
   id: number;
-  name?: string;
+  course_name?: string;
   title?: string;
-  code?: string;
+  course_code?: string;
 }
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    Boolean(localStorage.getItem("access_token"))
+  );
+
   const [courses, setCourses] = useState<Course[]>([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
+
     getCourses()
       .then((data) => {
         console.log("Courses:", data);
@@ -22,7 +31,15 @@ function App() {
         console.error(err);
         setError(err.message);
       });
-  }, []);
+  }, [isAuthenticated]);
+
+  if (!isAuthenticated) {
+    return (
+      <LoginForm
+        onLogin={() => setIsAuthenticated(true)}
+      />
+    );
+  }
 
   return (
     <div>
@@ -39,7 +56,7 @@ function App() {
       {courses.map((course) => (
         <div key={course.id}>
           <p>
-            {course.code} - {course.name || course.title}
+            {course.course_code} - {course.course_name || course.title}
           </p>
         </div>
       ))}
